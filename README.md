@@ -1,123 +1,173 @@
 ﻿<div align="center">
   <h1>⚡ Nexara AI</h1>
   <p><strong>Your next era starts here.</strong></p>
-  <p>An AI-driven adaptive onboarding engine that maps personalized learning pathways by analyzing skill gaps between a candidate resume and target job description.</p>
+  <p>An AI-driven adaptive onboarding engine that builds personalized, prerequisite-aware learning roadmaps by analyzing the skill gap between a candidate resume and a target job description.</p>
 
   ![React](https://img.shields.io/badge/React-19-blue)
-  ![FastAPI](https://img.shields.io/badge/FastAPI-0.100-green)
-  ![Groq](https://img.shields.io/badge/Groq-Llama3-orange)
+  ![FastAPI](https://img.shields.io/badge/FastAPI-green)
+  ![Groq](https://img.shields.io/badge/Groq-Llama3.3-orange)
   ![License](https://img.shields.io/badge/License-MIT-purple)
+  ![Live](https://img.shields.io/badge/Live-Deployed-brightgreen)
 </div>
+
+---
+
+## 🌐 Live Demo
+
+| Service | URL |
+|---------|-----|
+| 🎯 **Frontend App** | https://nexara-ai-journey.vercel.app |
+| 🔧 **Backend API** | https://nexara-backend.onrender.com |
+| 📚 **API Docs (Swagger)** | https://nexara-backend.onrender.com/docs |
+| 📁 **GitHub** | https://github.com/atharvakelkar1108-rgb/nexara-ai-journey |
 
 ---
 
 ## 🎯 Problem Statement
 
-Corporate onboarding often uses static one-size-fits-all curricula. Experienced hires waste time on known concepts while beginners get overwhelmed. Nexara solves this by building a personalized, prerequisite-aware learning roadmap for every individual.
+Corporate onboarding often uses static, one-size-fits-all curricula:
+- Experienced hires waste time on concepts they already know
+- Beginners get overwhelmed by advanced modules
+- No personalization at scale
+
+Nexara solves this by building a unique learning roadmap per person, based on their actual skill gaps relative to the target role.
 
 ---
 
 ## ✨ Features
 
-- **AI Skill Extraction** — Parses resume and JD using Llama 3.3 70B via Groq
-- **Smart Gap Analysis** — Compares candidate skills vs role requirements with level matching
-- **Adaptive Path Engine** — NetworkX DAG with topological sort for prerequisite ordering
-- **Reasoning Trace** — Every module recommendation includes AI-generated justification
-- **Zero Hallucination** — All modules strictly from predefined course catalog
+- **AI Skill Extraction** — Llama 3.3 70B parses resume and JD into structured JSON with skill names and proficiency levels
+- **Skill Normalization** — Custom alias dictionary maps informal names (JS→JavaScript, k8s→Kubernetes)
+- **Level-aware Gap Analysis** — Three-way classification: exact match / level mismatch / completely missing
+- **Adaptive Path Engine** — NetworkX DAG with topological sort ensures prerequisites are always respected
+- **Reasoning Trace** — Every module includes an AI-generated explanation of why it was selected
+- **Zero Hallucination** — All recommendations come strictly from a predefined course catalog
 - **Cross-Domain** — Supports Technical, Managerial, and Operational job categories
-- **3 Input Modes** — Upload JD / Pick from Role Explorer / Just type job title
+- **3 Input Modes** — Upload JD / Pick from Role Explorer / Type job title
 - **Comparison Mode** — Analyze 2 resumes against 1 JD simultaneously
 - **Gamification** — XP, levels, badges, streaks, leaderboard
-- **Dark/Light Mode** — Full theme support
+- **Dark / Light Mode** — Full theme toggle
 - **AI Chat Sidebar** — Ask questions about your roadmap in real time
 
 ---
 
 ## 🏗️ Architecture
 ```
-Resume + JD
-     ↓
-Skill Extractor (Llama 3.3 via Groq)
-     ↓
-Gap Analyzer (Level-aware comparison)
-     ↓
-Adaptive Path Engine (NetworkX DAG + Topological Sort)
-     ↓
-Reasoning Generator (Per-module AI justification)
-     ↓
+Resume + JD Input
+       ↓
+Skill Extractor  →  Llama 3.3 70B via Groq
+       ↓
+Skill Normalizer →  Alias dictionary
+       ↓
+Gap Analyzer     →  Level-aware 3-way classification
+       ↓
+Path Engine      →  NetworkX DAG + Topological Sort
+       ↓
+Reasoning Engine →  Per-module AI justification
+       ↓
 Personalized Learning Roadmap
 ```
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Setup and Installation
 
 ### Prerequisites
 - Node.js 18+
 - Python 3.11+
-- Groq API Key (free at console.groq.com)
+- Groq API Key — free at console.groq.com
 
 ### Frontend
 ```bash
 npm install
 npm run dev
 ```
-Runs at `http://localhost:5173`
+Runs at http://localhost:5173
 
 ### Backend
 ```bash
 cd backend
 python -m venv venv
-venv\Scripts\activate        # Windows
-source venv/bin/activate     # Mac/Linux
+venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env         # Add your GROQ_API_KEY
+cp .env.example .env
 python main.py
 ```
-Runs at `http://localhost:8000`
+Runs at http://localhost:8000
 
 ### API Docs
-Visit `http://localhost:8000/docs` for interactive Swagger UI
+Visit http://localhost:8000/docs for Swagger UI
 
 ---
 
 ## 🧠 Skill Gap Algorithm
 
-1. **Extraction** — LLM parses resume into structured JSON skill list with proficiency levels (beginner/intermediate/expert)
-2. **Normalization** — Skills normalized against O*NET taxonomy to prevent name mismatches
-3. **Gap Detection** — Three-way classification: exact match, level mismatch, completely missing
-4. **Readiness Score** — `(matched skills / total required) * 100`
-5. **Path Building** — NetworkX DiGraph built from course catalog prerequisites, topological sort applied, modules filtered to only those that close identified gaps
-6. **Ordering** — Prerequisites automatically prepended when a dependent module is selected
+1. **Text Extraction** — PDFPlumber extracts raw text from uploaded PDF files
+2. **LLM Parsing** — Llama 3.3 70B returns structured JSON with skill names and proficiency levels
+3. **Normalization** — Alias dictionary maps informal names to standard titles
+4. **Gap Detection** — Per skill: exact match / level mismatch / completely missing
+5. **Readiness Score** — (exact matches / total JD requirements) x 100
+6. **Path Building** — NetworkX DiGraph built from course catalog, topological sort applied
+7. **Prerequisite Injection** — Unmet prerequisites automatically prepended to the path
+8. **Reasoning** — Per-module AI explanation generated for full transparency
 
 ---
 
-## 📊 Datasets Used
+## 🤖 Models and Tools
 
-| Dataset | Source | Usage |
-|---------|--------|-------|
-| O*NET Database | onetcenter.org | Skill normalization taxonomy |
-| Resume Dataset | Kaggle (snehaanbhawal) | Testing & validation |
-| Job Description Dataset | Kaggle (kshitizregmi) | Testing & validation |
-
----
-
-## 🤖 Models Used
-
-| Model | Provider | Usage |
-|-------|----------|-------|
-| Llama 3.3 70B Versatile | Groq | Skill extraction + reasoning generation |
+| Tool | Purpose |
+|------|---------|
+| Llama 3.3 70B Versatile (Groq) | Skill extraction from resume and JD |
+| NetworkX | Prerequisite dependency graph + topological sort |
+| PDFPlumber | PDF text extraction |
+| FastAPI | Backend REST API |
+| React 19 + Vite | Frontend application |
+| TailwindCSS v4 | Styling |
 
 ---
 
-## 📏 Evaluation Metrics
+## 📊 Datasets Referenced
 
-| Metric | Description |
-|--------|-------------|
-| Extraction Accuracy | Validated on 20 sample resumes |
-| Zero Hallucination | All modules validated against catalog |
-| Redundancy Reduction | Average modules skipped vs static curriculum |
-| Cross-domain Coverage | Tested on 8 diverse job roles |
+| Dataset | Source | Purpose |
+|---------|--------|---------|
+| O*NET Skill Taxonomy | onetcenter.org | Inspiration for skill normalization structure |
+| Resume Dataset | Kaggle (snehaanbhawal) | Reference for resume format understanding |
+| Job Description Dataset | Kaggle (kshitizregmi) | Reference for JD format understanding |
+
+Note: The course catalog and skill normalization dictionary were built manually. These datasets were used as domain reference only.
+
+---
+
+## 📏 Key Metrics
+
+| Metric | Value |
+|--------|-------|
+| Readiness Score | Calculated per analysis: (matches / total) x 100 |
+| Hallucination Rate | 0% — all modules from predefined catalog |
+| Job Categories Supported | 3 (Technical, Managerial, Operational) |
+| Roles in Explorer | 8 built-in roles |
+| Course Catalog Size | 19 modules across all categories |
+
+---
+
+## 📁 Project Structure
+```
+nexara-ai-journey/
+├── src/
+│   ├── components/          # Navbar, HeroSection, HowItWorks
+│   ├── pages/               # All page components
+│   ├── context/             # Theme + Auth context
+│   ├── data/                # Course catalog + mock data
+│   └── api/                 # API client
+├── backend/
+│   ├── main.py              # FastAPI endpoints
+│   ├── skill_extractor.py   # LLM skill parsing
+│   ├── gap_engine.py        # Gap analysis + path algorithm
+│   ├── skill_normalizer.py  # Alias normalization
+│   └── requirements.txt
+├── Dockerfile
+└── README.md
+```
 
 ---
 
@@ -129,29 +179,9 @@ docker run -p 8000:8000 -e GROQ_API_KEY=your_key nexara
 
 ---
 
-## 📁 Project Structure
-```
-nexara-ai-journey/
-├── src/                    # React frontend
-│   ├── components/         # Navbar, HeroSection, HowItWorks
-│   ├── pages/              # All page components
-│   ├── context/            # Theme + Auth context
-│   ├── data/               # Mock data & course catalog
-│   └── api/                # API client
-├── backend/                # Python FastAPI backend
-│   ├── main.py             # API endpoints
-│   ├── skill_extractor.py  # LLM-based skill parsing
-│   ├── gap_engine.py       # Gap analysis + adaptive pathing
-│   └── requirements.txt
-├── Dockerfile
-└── README.md
-```
+## 👥 Team
 
----
-
-## 👨‍💻 Team
-
-Built with ❤️ for ARTPARK CodeForge Hackathon 2025
+**Team Fast and Curious** — ARTPARK CodeForge Hackathon 2025
 
 ---
 
