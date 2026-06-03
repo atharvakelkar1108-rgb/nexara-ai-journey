@@ -6,6 +6,9 @@ export async function analyzeDocuments(resumeFile: File, jdFile: File) {
   form.append("jd", jdFile)
 
   const res = await fetch(`${BASE}/analyze`, { method: "POST", body: form })
-  if (!res.ok) throw new Error("Analysis failed")
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(body || "Analysis failed")
+  }
   return res.json()
 }

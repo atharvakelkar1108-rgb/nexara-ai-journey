@@ -9,7 +9,13 @@ from pathlib import Path
 dotenv_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=dotenv_path)
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
+    raise RuntimeError(
+        "Missing GROQ_API_KEY in backend/.env. Please set your Groq API key before running the backend."
+    )
+
+client = Groq(api_key=GROQ_API_KEY)
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:

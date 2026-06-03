@@ -1,10 +1,65 @@
-﻿import { Trophy, Flame, BookOpen, Zap } from 'lucide-react'
+﻿import { useEffect, useState } from 'react'
+import { Trophy, Flame, BookOpen, Zap } from 'lucide-react'
 import { LEADERBOARD } from '../data/mockData'
 import { useAuth } from '../context/AuthContext'
+import { fetchLeaderboardSnapshot } from '../api/leaderboard'
+import type { LeaderboardEntry } from '../api/leaderboard'
 
 export default function LeaderboardPage() {
   const { user } = useAuth()
-  const top3 = LEADERBOARD.slice(0, 3)
+  const [entries, setEntries] = useState<LeaderboardEntry[]>(LEADERBOARD)
+  const [connected, setConnected] = useState(false)
+  const [streamError, setStreamError] = useState('')
+  const top3 = entries.slice(0, 3)
+
+  useEffect(() => {
+    let poller: ReturnType<typeof setInterval> | null = null
+    const fallbackPolling = () => {
+      poller = window.setInterval(async () => {
+        try {
+          const nextEntries = await fetchLeaderboardSnapshot()
+          setEntries(nextEntries)
+        } catch {
+          setStreamError('Unable to refresh leaderboard data. Please reload the page.')
+          if (poller) window.clearInterval(poller)
+        }
+      }, 5000)
+    }
+
+    if (typeof EventSource === 'undefined') {
+      setStreamError('Realtime streaming not supported in this browser. Using periodic polling.')
+      fallbackPolling()
+      return () => {
+        if (poller) window.clearInterval(poller)
+      }
+    }
+
+    const source = new EventSource('http://localhost:8000/leaderboard/stream')
+
+    source.onmessage = event => {
+      try {
+        const nextEntries = JSON.parse(event.data) as LeaderboardEntry[]
+        setEntries(nextEntries)
+        setConnected(true)
+        setStreamError('')
+      } catch {
+        setStreamError('Failed to parse realtime leaderboard data.')
+      }
+    }
+
+    source.onerror = () => {
+      setConnected(false)
+      setStreamError('Realtime disconnected. Using periodic polling refresh.')
+      source.close()
+      fallbackPolling()
+    }
+
+    return () => {
+      source.close()
+      if (poller) window.clearInterval(poller)
+    }
+  }, [])
+
   return (
     <div style={{ minHeight: '100vh', position: 'relative', paddingTop: 96, paddingBottom: 64 }}>
       <div className="aurora-bg" style={{ position: 'absolute', inset: 0, opacity: 0.5 }} />
@@ -15,7 +70,8 @@ export default function LeaderboardPage() {
             <Trophy size={14} /> Global Leaderboard
           </div>
           <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 'clamp(32px,5vw,52px)', margin: '0 0 12px' }}>Top <span className="gradient-text">learners</span></h1>
-          <p style={{ color: '#6b7280', margin: 0 }}>Compete, learn, and climb the ranks • <span style={{fontFamily:'JetBrains Mono,monospace', fontSize:11}}>Demo data shown</span></p>
+          <p style={{ color: '#6b7280', margin: 0 }}>Compete, learn, and climb the ranks • <span style={{fontFamily:'JetBrains Mono,monospace', fontSize:11}}>{connected ? 'Realtime updates enabled' : 'Realtime leaderboard with fallback polling'}</span></p>
+          {streamError && <p style={{ color: '#f87171', fontSize: 12, margin: '10px 0 0', fontFamily: 'JetBrains Mono,monospace' }}>{streamError}</p>}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32, alignItems: 'flex-end' }}>
@@ -43,7 +99,7 @@ export default function LeaderboardPage() {
             <Trophy size={16} color="#fbbf24" />
             <span style={{ fontFamily: 'Syne,sans-serif', fontWeight: 600, fontSize: 14 }}>Full Rankings</span>
           </div>
-          {LEADERBOARD.map(entry => {
+          {entries.map(entry => {
             const isYou = entry.name === (user?.name || 'Atharva Kelkar')
             return (
               <div key={entry.rank} style={{ padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1px solid rgba(255,255,255,0.05)', background: isYou ? 'rgba(108,99,255,0.08)' : undefined, borderLeft: isYou ? '3px solid #6C63FF' : '3px solid transparent' }}>

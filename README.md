@@ -46,6 +46,7 @@ Nexara solves this by building a unique learning roadmap per person, based on th
 - **3 Input Modes** — Upload JD / Pick from Role Explorer / Type job title
 - **Comparison Mode** — Analyze 2 resumes against 1 JD simultaneously
 - **Gamification** — XP, levels, badges, streaks, leaderboard
+- **Realtime Leaderboard** — live rank updates via free server-sent events (SSE)
 - **Dark / Light Mode** — Full theme toggle
 - **AI Chat Sidebar** — Ask questions about your roadmap in real time
 
@@ -91,9 +92,14 @@ python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env
+# edit backend/.env and add your GROQ_API_KEY before running
 python main.py
 ```
 Runs at http://localhost:8000
+
+### Realtime Leaderboard
+The backend exposes a free Server-Sent Events endpoint at `http://localhost:8000/leaderboard/stream`.
+The frontend uses browser EventSource to receive live leaderboard updates without any paid toolchain.
 
 ### API Docs
 Visit http://localhost:8000/docs for Swagger UI
@@ -176,12 +182,6 @@ nexara-ai-journey/
 docker build -t nexara .
 docker run -p 8000:8000 -e GROQ_API_KEY=your_key nexara
 ```
-
----
-
-## 👥 Team
-
-**Team Fast and Curious** — ARTPARK CodeForge Hackathon 2025
 
 ---
 

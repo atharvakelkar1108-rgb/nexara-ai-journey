@@ -119,9 +119,10 @@ export default function AnalyzePage() {
       sessionStorage.setItem('nexara_result', JSON.stringify(result))
       await new Promise(r => setTimeout(r, 500))
       navigate('/results')
-    } catch {
+    } catch (err) {
       clearInterval(msgInterval)
-      setError('Analysis failed. Check your files and try again.')
+      const message = err instanceof Error ? err.message : 'Analysis failed. Check your files and try again.'
+      setError(message)
       setLoading(false)
       setMsgIdx(0); setProgress(0)
     }
