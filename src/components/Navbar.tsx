@@ -23,15 +23,15 @@ export default function Navbar() {
 
   return (
     <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50 }} className="glass-light">
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6C63FF, #00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', minWidth: 0 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6C63FF, #00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Zap size={16} color="white" />
           </div>
-          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 20 }} className="gradient-text">Nexara</span>
+          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 20 }} className="gradient-text hidden sm:inline">Nexara</span>
         </Link>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ display: 'none', alignItems: 'center', gap: 4 }} className="sm:flex">
           {links.map(l => (
             <Link key={l.to} to={l.to} style={{
               padding: '8px 16px', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'all 0.2s',
@@ -41,7 +41,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button onClick={toggle} style={{ width: 36, height: 36, borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
@@ -77,14 +77,14 @@ export default function Navbar() {
             </div>
           )}
 
-          <button onClick={() => setMobileOpen(!mobileOpen)} style={{ width: 36, height: 36, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
+          <button onClick={() => setMobileOpen(!mobileOpen)} style={{ width: 36, height: 36, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme === 'dark' ? '#9ca3af' : '#6b7280' }} className="sm:hidden">
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
       {mobileOpen && (
-        <div className="glass-light" style={{ padding: '12px 24px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="glass-light sm:hidden" style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           {links.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)} style={{ display: 'block', padding: '10px 16px', borderRadius: 8, textDecoration: 'none', fontSize: 14, color: theme === 'dark' ? '#d1d5db' : '#374151' }}>{l.label}</Link>
           ))}

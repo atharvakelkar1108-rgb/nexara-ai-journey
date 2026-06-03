@@ -18,16 +18,16 @@ export default function HowItWorks() {
   }, [])
 
   return (
-    <section ref={ref} style={{ padding: '120px 24px', position: 'relative', overflow: 'hidden' }}>
+    <section ref={ref} style={{ padding: 'clamp(60px, 10vw, 120px) 16px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 80 }}>
-          <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(32px, 5vw, 52px)', margin: '0 0 16px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(40px, 10vw, 80px)' }}>
+          <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(28px, 5vw, 52px)', margin: '0 0 16px' }}>
             How <span className="gradient-text">Nexara</span> works
           </h2>
-          <p style={{ color: '#6b7280', fontSize: 16, margin: 0 }}>Three steps from resume to role-readiness</p>
+          <p style={{ color: '#6b7280', fontSize: 'clamp(14px, 4vw, 16px)', margin: 0 }}>Three steps from resume to role-readiness</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'clamp(16px, 5vw, 24px)' }}>
           {steps.map((step, i) => {
             const Icon = step.icon
             return (
@@ -43,8 +43,8 @@ export default function HowItWorks() {
                 <div style={{ width: 56, height: 56, borderRadius: 16, background: step.color, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 0 30px rgba(108,99,255,0.3)' }}>
                   <Icon size={24} color="white" />
                 </div>
-                <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 20, margin: '0 0 12px' }}>{step.title}</h3>
-                <p style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
+                <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 'clamp(18px, 5vw, 20px)', margin: '0 0 12px' }}>{step.title}</h3>
+                <p style={{ color: '#6b7280', fontSize: 'clamp(13px, 4vw, 14px)', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
               </div>
             )
           })}

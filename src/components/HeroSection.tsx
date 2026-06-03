@@ -42,14 +42,14 @@ export default function HeroSection() {
   const s3 = useCountUp(10, 2000, statsVisible)
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', paddingTop: 64 }}>
+    <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', paddingTop: 64, paddingLeft: 12, paddingRight: 12 }}>
       <div className="aurora-bg" style={{ position: 'absolute', inset: 0 }} />
       <div className="dot-grid" style={{ position: 'absolute', inset: 0, opacity: 0.4 }} />
 
-      <div style={{ position: 'absolute', top: '20%', left: '10%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(108,99,255,0.1)', filter: 'blur(60px)' }} className="animate-float" />
-      <div style={{ position: 'absolute', bottom: '20%', right: '10%', width: 250, height: 250, borderRadius: '50%', background: 'rgba(0,212,255,0.08)', filter: 'blur(60px)' }} className="animate-float" />
+      <div className="hidden sm:block animate-float" style={{ position: 'absolute', top: '20%', left: '10%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(108,99,255,0.1)', filter: 'blur(60px)' }} />
+      <div className="hidden sm:block animate-float" style={{ position: 'absolute', bottom: '20%', right: '10%', width: 250, height: 250, borderRadius: '50%', background: 'rgba(0,212,255,0.08)', filter: 'blur(60px)' }} />
 
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: 800, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+      <div style={{ position: 'relative', zIndex: 10, maxWidth: 800, margin: '0 auto', padding: '0 12px', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 9999, border: '1px solid rgba(108,99,255,0.4)', background: 'rgba(108,99,255,0.1)', color: '#7c83fc', fontSize: 13, fontFamily: 'JetBrains Mono, monospace', marginBottom: 32 }} className="animate-fade-in">
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#7c83fc' }} className="animate-pulse" />
           ✦ Powered by AI • Adaptive Learning Engine

@@ -65,17 +65,17 @@ export default function LeaderboardPage() {
     <div style={{ minHeight: '100vh', position: 'relative', paddingTop: 96, paddingBottom: 64 }}>
       <div className="aurora-bg" style={{ position: 'absolute', inset: 0, opacity: 0.5 }} />
       <div className="dot-grid" style={{ position: 'absolute', inset: 0, opacity: 0.2 }} />
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: 700, margin: '0 auto', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+      <div style={{ position: 'relative', zIndex: 10, maxWidth: 700, margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 8vw, 48px)' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 9999, border: '1px solid rgba(251,191,36,0.3)', background: 'rgba(251,191,36,0.1)', color: '#fbbf24', fontSize: 13, fontFamily: 'JetBrains Mono,monospace', marginBottom: 20 }}>
             <Trophy size={14} /> Global Leaderboard
           </div>
-          <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 'clamp(32px,5vw,52px)', margin: '0 0 12px' }}>Top <span className="gradient-text">learners</span></h1>
-          <p style={{ color: '#6b7280', margin: 0 }}>Compete, learn, and climb the ranks • <span style={{fontFamily:'JetBrains Mono,monospace', fontSize:11}}>{connected ? 'Realtime updates enabled' : 'Realtime leaderboard with fallback polling'}</span></p>
-          {streamError && <p style={{ color: '#f87171', fontSize: 12, margin: '10px 0 0', fontFamily: 'JetBrains Mono,monospace' }}>{streamError}</p>}
+          <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 'clamp(28px,5vw,52px)', margin: '0 0 12px' }}>Top <span className="gradient-text">learners</span></h1>
+          <p style={{ color: '#6b7280', margin: 0, fontSize: 'clamp(13px, 4vw, 15px)' }}>Compete, learn, and climb the ranks • <span style={{fontFamily:'JetBrains Mono,monospace', fontSize:'clamp(10px, 2vw, 11px)'}}>{connected ? 'Realtime updates enabled' : 'Realtime leaderboard with fallback polling'}</span></p>
+          {streamError && <p style={{ color: '#f87171', fontSize: 'clamp(11px, 2vw, 12px)', margin: '10px 0 0', fontFamily: 'JetBrains Mono,monospace' }}>{streamError}</p>}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32, alignItems: 'flex-end' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'clamp(12px, 4vw, 16px)', marginBottom: 'clamp(24px, 8vw, 32px)', alignItems: 'flex-end' }}>
           {[top3[1], top3[0], top3[2]].map((entry, pi) => {
             const heights = [112, 144, 96]
             const colors = ['rgba(156,163,175,0.15)','rgba(251,191,36,0.15)','rgba(251,146,60,0.15)']
@@ -96,30 +96,30 @@ export default function LeaderboardPage() {
         </div>
 
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ padding: '16px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <Trophy size={16} color="#fbbf24" />
             <span style={{ fontFamily: 'Syne,sans-serif', fontWeight: 600, fontSize: 14 }}>Full Rankings</span>
           </div>
           {entries.map(entry => {
             const isYou = entry.name === (user?.name || 'Atharva Kelkar')
             return (
-              <div key={entry.rank} style={{ padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1px solid rgba(255,255,255,0.05)', background: isYou ? 'rgba(108,99,255,0.08)' : undefined, borderLeft: isYou ? '3px solid #6C63FF' : '3px solid transparent' }}>
-                <div style={{ width: 28, textAlign: 'center', fontFamily: 'JetBrains Mono,monospace', fontWeight: 700, fontSize: 13, color: entry.rank === 1 ? '#fbbf24' : entry.rank === 2 ? '#9ca3af' : entry.rank === 3 ? '#fb923c' : '#6b7280' }}>
+              <div key={entry.rank} style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 'clamp(10px, 3vw, 14px)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: isYou ? 'rgba(108,99,255,0.08)' : undefined, borderLeft: isYou ? '3px solid #6C63FF' : '3px solid transparent', flexWrap: 'wrap' }}>
+                <div style={{ width: 28, textAlign: 'center', fontFamily: 'JetBrains Mono,monospace', fontWeight: 700, fontSize: 13, color: entry.rank === 1 ? '#fbbf24' : entry.rank === 2 ? '#9ca3af' : entry.rank === 3 ? '#fb923c' : '#6b7280', flexShrink: 0 }}>
                   {entry.rank <= 3 ? entry.badge : `#${entry.rank}`}
                 </div>
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: 'linear-gradient(135deg,rgba(108,99,255,0.2),rgba(0,212,255,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{entry.avatar}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <p style={{ margin: 0, fontFamily: 'Syne,sans-serif', fontWeight: 600, fontSize: 14 }}>{entry.name}</p>
-                    {isYou && <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 9999, background: 'rgba(108,99,255,0.2)', color: '#7c83fc', fontFamily: 'JetBrains Mono,monospace' }}>you</span>}
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,rgba(108,99,255,0.2),rgba(0,212,255,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{entry.avatar}</div>
+                <div style={{ flex: 1, minWidth: '120px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <p style={{ margin: 0, fontFamily: 'Syne,sans-serif', fontWeight: 600, fontSize: 'clamp(13px, 3vw, 14px)' }}>{entry.name.split(' ')[0]}</p>
+                    {isYou && <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 9999, background: 'rgba(108,99,255,0.2)', color: '#7c83fc', fontFamily: 'JetBrains Mono,monospace', flexShrink: 0 }}>you</span>}
                   </div>
-                  <div className="xp-bar" style={{ marginTop: 5, width: 100 }}><div className="xp-fill" style={{ width: `${Math.min((entry.xp / 5000) * 100, 100)}%` }} /></div>
+                  <div className="xp-bar hidden sm:block" style={{ marginTop: 5, width: '100%' }}><div className="xp-fill" style={{ width: `${Math.min((entry.xp / 5000) * 100, 100)}%` }} /></div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#6b7280' }}><Zap size={12} color="#7c83fc" />{entry.xp.toLocaleString()}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#6b7280' }}><BookOpen size={12} />{entry.modules}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#6b7280' }}><Flame size={12} color="#fb923c" />{entry.streak}d</span>
-                  <span style={{ fontSize: 12, color: '#7c83fc', fontFamily: 'JetBrains Mono,monospace', fontWeight: 600 }}>Lv.{entry.level}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)', fontSize: 'clamp(11px, 2vw, 12px)', color: '#6b7280', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end', minWidth: '100%', paddingLeft: '40px' }} className="sm:min-w-auto sm:pl-0 sm:justify-end">
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Zap size={11} color="#7c83fc" />{entry.xp.toLocaleString()}</span>
+                  <span style={{ display: 'none', alignItems: 'center', gap: 3 }} className="sm:flex"><BookOpen size={11} />{entry.modules}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Flame size={11} color="#fb923c" />{entry.streak}d</span>
+                  <span style={{ fontSize: 'clamp(10px, 2vw, 12px)', color: '#7c83fc', fontFamily: 'JetBrains Mono,monospace', fontWeight: 600 }}>Lv.{entry.level}</span>
                 </div>
               </div>
             )
