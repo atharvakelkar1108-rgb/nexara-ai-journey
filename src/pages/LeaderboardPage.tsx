@@ -14,6 +14,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     let poller: ReturnType<typeof setInterval> | null = null
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
     const fallbackPolling = () => {
       poller = window.setInterval(async () => {
         try {
@@ -34,7 +35,7 @@ export default function LeaderboardPage() {
       }
     }
 
-    const source = new EventSource('http://localhost:8000/leaderboard/stream')
+    const source = new EventSource(`${backendUrl}/leaderboard/stream`)
 
     source.onmessage = event => {
       try {

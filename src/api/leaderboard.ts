@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:8000'
+const BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
 export type LeaderboardEntry = {
   rank: number
