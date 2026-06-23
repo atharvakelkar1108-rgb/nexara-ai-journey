@@ -21,9 +21,24 @@ const COURSE_LINKS: Record<string, string> = {
   'agile-scrum': 'https://www.scrum.org/resources/what-is-scrum',
   'safety-protocols': 'https://www.osha.gov/training',
   'logistics-ops': 'https://www.coursera.org/learn/operations-management',
+  'qa-fundamentals': 'https://www.coursera.org/learn/software-testing',
+  'test-automation': 'https://www.selenium.dev/documentation/',
+  'api-testing': 'https://learning.postman.com/docs/getting-started/introduction/',
+  'node-backend': 'https://nodejs.org/en/learn/getting-started/introduction-to-nodejs',
+  'data-science': 'https://www.kaggle.com/learn/pandas',
+  'cybersecurity': 'https://www.coursera.org/learn/intro-cyber-security',
+  'ux-design': 'https://www.interaction-design.org/literature/topics/ux-design',
+  'business-analysis': 'https://www.iiba.org/career-resources/a-business-analysis-professionals-foundation-for-success/',
+  'data-analytics': 'https://www.coursera.org/learn/excel-data-analytics',
+  'digital-marketing': 'https://learndigital.withgoogle.com/digitalgarage',
+  'sales-fundamentals': 'https://www.coursera.org/learn/introduction-to-sales',
+  'hr-fundamentals': 'https://www.coursera.org/learn/human-resources-fundamentals',
+  'customer-support': 'https://www.coursera.org/learn/customer-service',
+  'supply-chain': 'https://www.coursera.org/learn/supply-chain-management',
+  'quality-control': 'https://www.coursera.org/learn/six-sigma',
 }
 
-function ReadinessRing({ score }: { score: number }) {
+function ReadinessRing({ score, modulesAway }: { score: number; modulesAway: number }) {
   const r = 54, circ = 2 * Math.PI * r
   const [animated, setAnimated] = useState(0)
   useEffect(() => { setTimeout(() => setAnimated(score), 300) }, [score])
@@ -42,7 +57,7 @@ function ReadinessRing({ score }: { score: number }) {
         </div>
       </div>
       <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', margin: '12px 0 0' }}>
-        You are <span style={{ color: '#7c83fc', fontWeight: 600 }}>{6} modules</span> away from full role-readiness
+        You are <span style={{ color: '#7c83fc', fontWeight: 600 }}>{modulesAway} module{modulesAway === 1 ? '' : 's'}</span> away from full role-readiness
       </p>
     </div>
   )
@@ -74,7 +89,7 @@ function AIChat({ onClose, trace }: { onClose: () => void, trace: string[] }) {
   }
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs, typing])
   return (
-    <div className="card animate-scale-in" style={{ position: 'fixed', bottom: 24, right: 24, width: 320, height: 400, display: 'flex', flexDirection: 'column', zIndex: 50, padding: 0, overflow: 'hidden' }}>
+    <div className="card animate-scale-in ai-chat-panel" style={{ position: 'fixed', bottom: 24, right: 24, width: 320, height: 400, display: 'flex', flexDirection: 'column', zIndex: 50, padding: 0, overflow: 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#6C63FF,#00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Zap size={14} color="white" /></div>
@@ -115,12 +130,12 @@ export default function ResultsPage() {
   const saved = sessionStorage.getItem('nexara_result')
   const result = saved ? JSON.parse(saved) : null
 
-  const have = result?.gap?.have || MOCK_ROADMAP.have
-  const improve = result?.gap?.improve || MOCK_ROADMAP.improve
-  const missing = result?.gap?.missing || MOCK_ROADMAP.missing
-  const score = result?.readiness_score || MOCK_ROADMAP.readinessScore
-  const modules = result?.modules || MOCK_ROADMAP.modules
-  const trace = result?.reasoning_trace || []
+  const have = result ? (result.gap?.have ?? []) : MOCK_ROADMAP.have
+  const improve = result ? (result.gap?.improve ?? []) : MOCK_ROADMAP.improve
+  const missing = result ? (result.gap?.missing ?? []) : MOCK_ROADMAP.missing
+  const score = result ? (result.readiness_score ?? 0) : MOCK_ROADMAP.readinessScore
+  const modules = result ? (result.modules ?? []) : MOCK_ROADMAP.modules
+  const trace = result?.reasoning_trace ?? []
 
   const toggleComplete = (id: string) => {
     const newVal = !completed[id]
@@ -142,12 +157,12 @@ export default function ResultsPage() {
   }
 
   const completedCount = Object.values(completed).filter(Boolean).length
-  const totalProgress = Math.round((completedCount / modules.length) * 100)
+  const totalProgress = modules.length > 0 ? Math.round((completedCount / modules.length) * 100) : 0
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', paddingTop: 96, paddingBottom: 64 }}>
+    <div className="results-page" style={{ minHeight: '100vh', position: 'relative', paddingTop: 96, paddingBottom: 64 }}>
       <div className="aurora-bg" style={{ position: 'absolute', inset: 0, opacity: 0.5 }} />
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: 800, margin: '0 auto', padding: '0 24px' }}>
+      <div className="page-content" style={{ position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 'clamp(28px,4vw,44px)', margin: '0 0 8px' }}>Your <span className="gradient-text">personalized path</span></h1>
           {result?.job_title && <p style={{ color: '#7c83fc', fontSize: 14, fontFamily: 'JetBrains Mono,monospace', margin: '0 0 4px' }}>Role: {result.job_title}</p>}
@@ -155,8 +170,8 @@ export default function ResultsPage() {
         </div>
 
         <div className="card" style={{ marginBottom: 32, padding: 0, overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <div style={{ padding: 24, borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="skill-snapshot-grid">
+            <div className="skill-snapshot-skills">
               <h3 style={{ fontSize: 11, fontFamily: 'JetBrains Mono,monospace', color: '#6b7280', textTransform: 'uppercase' as const, letterSpacing: 2, margin: '0 0 16px' }}>Skill snapshot</h3>
               {[
                 { label: 'You have', pills: have, cls: 'skill-pill-green' },
@@ -165,11 +180,15 @@ export default function ResultsPage() {
               ].map(({ label, pills, cls }) => (
                 <div key={label} style={{ marginBottom: 12 }}>
                   <p style={{ fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono,monospace', margin: '0 0 6px' }}>{label}</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 4 }}>{pills.map((p: string) => <span key={p} className={cls}>{p}</span>)}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 4 }}>
+                    {pills.length > 0
+                      ? pills.map((p: string) => <span key={p} className={cls}>{p}</span>)
+                      : <span style={{ fontSize: 12, color: '#6b7280' }}>None identified</span>}
+                  </div>
                 </div>
               ))}
             </div>
-            <ReadinessRing score={score} />
+            <ReadinessRing score={score} modulesAway={modules.length} />
           </div>
           {completedCount > 0 && (
             <div style={{ padding: '12px 24px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
@@ -203,17 +222,25 @@ export default function ResultsPage() {
           </div>
         )}
 
-        <h2 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: 24, margin: '0 0 24px' }}>Learning roadmap</h2>
+        <h2 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: 'clamp(20px, 5vw, 24px)', margin: '0 0 24px' }}>Learning roadmap</h2>
+        {modules.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', padding: 32 }}>
+            <p style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600 }}>No learning modules matched this role yet.</p>
+            <p style={{ margin: 0, fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
+              Try uploading a full job description or pick a role from the Role Explorer for richer recommendations.
+            </p>
+          </div>
+        ) : (
         <div style={{ position: 'relative' }}>
-          <div style={{ position: 'absolute', left: 31, top: 0, bottom: 0, width: 1, background: 'linear-gradient(to bottom,#6C63FF,#00D4FF,transparent)' }} />
+          <div className="roadmap-timeline-line" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {modules.map((mod: any, i: number) => (
-              <div key={mod.id} style={{ paddingLeft: 72, opacity: 0, animation: `slideUp 0.6s ease-out ${i * 0.1}s forwards` }}>
-                <div style={{ position: 'absolute', left: 20, width: 24, height: 24, borderRadius: '50%', border: `2px solid ${completed[mod.id] ? '#00F5A0' : '#6C63FF'}`, background: completed[mod.id] ? '#00F5A0' : '#060912', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: completed[mod.id] ? '#060912' : '#7c83fc', fontFamily: 'JetBrains Mono,monospace', marginTop: 20, transition: 'all 0.3s' }}>
+              <div key={mod.id} className="roadmap-timeline-item" style={{ opacity: 0, animation: `slideUp 0.6s ease-out ${i * 0.1}s forwards` }}>
+                <div className="roadmap-timeline-node" style={{ border: `2px solid ${completed[mod.id] ? '#00F5A0' : '#6C63FF'}`, background: completed[mod.id] ? '#00F5A0' : '#060912', color: completed[mod.id] ? '#060912' : '#7c83fc' }}>
                   {completed[mod.id] ? <Check size={12} /> : String(i + 1).padStart(2, '0')}
                 </div>
                 <div className="card">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                  <div className="roadmap-card-header">
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' as const }}>
                         <h3 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: 17, margin: 0, textDecoration: completed[mod.id] ? 'line-through' : 'none', color: completed[mod.id] ? '#6b7280' : 'inherit' }}>{mod.title}</h3>
@@ -225,7 +252,7 @@ export default function ResultsPage() {
                         <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 4 }}>{(mod.skills_taught || mod.skills || []).map((s: string) => <span key={s} className="skill-pill-blue">{s}</span>)}</div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                    <div className="roadmap-card-actions">
                       <button onClick={() => handleStartLearning(mod.id)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg,#6C63FF,#00D4FF)', color: 'white', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans,sans-serif', whiteSpace: 'nowrap' as const }}>
                         <ExternalLink size={11} /> Start
                       </button>
@@ -247,8 +274,9 @@ export default function ResultsPage() {
             ))}
           </div>
         </div>
+        )}
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 40 }}>
+        <div className="results-actions">
           <button className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => window.print()}>
             <Download size={16} />Download PDF
           </button>

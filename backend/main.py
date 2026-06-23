@@ -6,7 +6,7 @@ import asyncio
 import json
 import os
 import random
-from skill_extractor import extract_text_from_pdf, extract_skills, extract_jd_requirements
+from skill_extractor import extract_text_from_pdf, extract_skills, extract_jd_requirements, infer_role_requirements
 from gap_engine import analyze_gap, build_learning_path, generate_reasoning
 
 app = FastAPI(title="Nexara API")
@@ -93,6 +93,11 @@ async def analyze_full(
 
         resume_data = extract_skills(resume_text)
         jd_data = extract_jd_requirements(jd_text)
+
+        if len(jd_data.get("required_skills", [])) < 6:
+            fallback_title = jd_data.get("job_title") or jd_text.split("\n", 1)[0].replace("Job Title:", "").strip()
+            if fallback_title:
+                jd_data = infer_role_requirements(fallback_title)
 
         gap = analyze_gap(resume_data["skills"], jd_data["required_skills"])
         job_category = jd_data.get("job_category", "technical")

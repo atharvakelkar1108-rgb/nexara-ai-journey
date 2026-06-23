@@ -21,18 +21,49 @@ COURSE_CATALOG = [
     {"id": "safety-protocols", "title": "Workplace Safety Protocols", "skills_taught": ["Safety", "Compliance", "OSHA"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 3, "category": "operational"},
     {"id": "logistics-ops", "title": "Logistics & Operations Management", "skills_taught": ["Logistics", "Operations", "Supply Chain"], "prerequisites": [], "difficulty": "Intermediate", "duration_hours": 5, "category": "operational"},
     {"id": "warehouse-mgmt", "title": "Warehouse Management Systems", "skills_taught": ["WMS", "Inventory", "Warehouse"], "prerequisites": ["logistics-ops"], "difficulty": "Intermediate", "duration_hours": 4, "category": "operational"},
+    {"id": "qa-fundamentals", "title": "QA & Software Testing Fundamentals", "skills_taught": ["QA", "Quality Assurance", "Manual Testing", "Software Testing", "Test Cases", "Test Planning"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 5, "category": "technical"},
+    {"id": "test-automation", "title": "Test Automation with Selenium", "skills_taught": ["Selenium", "Test Automation", "Automation Testing", "Automated Testing"], "prerequisites": ["qa-fundamentals"], "difficulty": "Intermediate", "duration_hours": 6, "category": "technical"},
+    {"id": "api-testing", "title": "API Testing & Postman", "skills_taught": ["API Testing", "Postman", "REST API Testing", "API Test"], "prerequisites": [], "difficulty": "Intermediate", "duration_hours": 4, "category": "technical"},
+    {"id": "node-backend", "title": "Node.js Backend Development", "skills_taught": ["Node.js", "Express", "REST APIs", "Backend"], "prerequisites": [], "difficulty": "Intermediate", "duration_hours": 8, "category": "technical"},
+    {"id": "data-science", "title": "Data Science with Python", "skills_taught": ["Data Science", "Pandas", "Data Analysis", "Statistics"], "prerequisites": ["python-basics"], "difficulty": "Intermediate", "duration_hours": 10, "category": "technical"},
+    {"id": "cybersecurity", "title": "Cybersecurity Fundamentals", "skills_taught": ["Cybersecurity", "Security", "Network Security", "Threat Analysis"], "prerequisites": [], "difficulty": "Intermediate", "duration_hours": 6, "category": "technical"},
+    {"id": "ux-design", "title": "UX/UI Design Fundamentals", "skills_taught": ["UX Design", "UI Design", "Figma", "User Research"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 5, "category": "technical"},
+    {"id": "business-analysis", "title": "Business Analysis Essentials", "skills_taught": ["Business Analysis", "Requirements Gathering", "Stakeholder Management"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "managerial"},
+    {"id": "data-analytics", "title": "Data Analytics & Excel", "skills_taught": ["Excel", "Data Analytics", "Reporting", "Dashboards"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "managerial"},
+    {"id": "digital-marketing", "title": "Digital Marketing Foundations", "skills_taught": ["Digital Marketing", "SEO", "Content Marketing", "Social Media"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "managerial"},
+    {"id": "sales-fundamentals", "title": "Sales & Client Management", "skills_taught": ["Sales", "Negotiation", "CRM", "Client Relations"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "managerial"},
+    {"id": "hr-fundamentals", "title": "HR & Talent Management", "skills_taught": ["HR", "Recruitment", "Talent Management", "Employee Relations"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "managerial"},
+    {"id": "customer-support", "title": "Customer Support Excellence", "skills_taught": ["Customer Support", "Communication", "Ticketing", "Problem Solving"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 3, "category": "operational"},
+    {"id": "supply-chain", "title": "Supply Chain Fundamentals", "skills_taught": ["Supply Chain", "Procurement", "Inventory Management"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "operational"},
+    {"id": "quality-control", "title": "Quality Control & Compliance", "skills_taught": ["Quality Control", "Compliance", "Auditing", "Process Improvement"], "prerequisites": [], "difficulty": "Beginner", "duration_hours": 4, "category": "operational"},
 ]
+
+def _skills_overlap(skills_needed: set, skills_taught: set) -> bool:
+    for needed in skills_needed:
+        for taught in skills_taught:
+            if needed == taught or needed in taught or taught in needed:
+                return True
+    return False
 
 def analyze_gap(resume_skills: List[Dict], jd_requirements: List[Dict]) -> Dict:
     resume_map = {s["name"].lower(): s for s in resume_skills}
     have, improve, missing = [], [], []
     level_order = {"beginner": 0, "intermediate": 1, "expert": 2}
 
+    def resume_match(required: str):
+        req_lower = required.lower()
+        if req_lower in resume_map:
+            return resume_map[req_lower]
+        for name, skill in resume_map.items():
+            if req_lower in name or name in req_lower:
+                return skill
+        return None
+
     for req in jd_requirements:
         name = req["name"]
-        name_lower = name.lower()
-        if name_lower in resume_map:
-            candidate_level = resume_map[name_lower].get("level", "beginner")
+        matched = resume_match(name)
+        if matched:
+            candidate_level = matched.get("level", "beginner")
             required_level = req.get("level_required", "beginner")
             if level_order.get(candidate_level, 0) >= level_order.get(required_level, 0):
                 have.append(name)
@@ -76,7 +107,7 @@ def build_learning_path(gap: Dict, job_category: str) -> List[Dict]:
         if not course:
             continue
         teaches = set(s.lower() for s in course["skills_taught"])
-        if not (teaches & skills_needed):
+        if not _skills_overlap(skills_needed, teaches):
             continue
         prereqs_met = all(p in selected_ids for p in course["prerequisites"])
         if course["prerequisites"] and not prereqs_met:
@@ -88,6 +119,19 @@ def build_learning_path(gap: Dict, job_category: str) -> List[Dict]:
                         selected_ids.add(prereq_id)
         selected.append(course)
         selected_ids.add(course["id"])
+
+    if not selected and skills_needed:
+        ranked = []
+        for course in catalog:
+            teaches = set(s.lower() for s in course["skills_taught"])
+            overlap = sum(
+                1 for needed in skills_needed
+                if any(needed == taught or needed in taught or taught in needed for taught in teaches)
+            )
+            if overlap:
+                ranked.append((overlap, course))
+        ranked.sort(key=lambda item: item[0], reverse=True)
+        selected = [course for _, course in ranked[:5]]
 
     return selected
 

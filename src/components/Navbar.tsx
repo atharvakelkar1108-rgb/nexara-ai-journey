@@ -71,7 +71,7 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="navbar-auth">
               <Link to="/login" className="btn-ghost" style={{ padding: '8px 16px', fontSize: 13 }}>Log in</Link>
               <Link to="/register" className="btn-primary" style={{ padding: '8px 16px', fontSize: 13 }}>Get started</Link>
             </div>
@@ -88,6 +88,12 @@ export default function Navbar() {
           {links.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)} style={{ display: 'block', padding: '10px 16px', borderRadius: 8, textDecoration: 'none', fontSize: 14, color: theme === 'dark' ? '#d1d5db' : '#374151' }}>{l.label}</Link>
           ))}
+          {!user && (
+            <div className="navbar-auth-mobile" style={{ display: 'none' }}>
+              <Link to="/login" onClick={() => setMobileOpen(false)} className="btn-ghost" style={{ padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>Log in</Link>
+              <Link to="/register" onClick={() => setMobileOpen(false)} className="btn-primary" style={{ padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>Get started</Link>
+            </div>
+          )}
         </div>
       )}
     </nav>

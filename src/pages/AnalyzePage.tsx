@@ -20,7 +20,7 @@ function UploadZone({ label, color, state, onChange }: { label: string; color: s
   }, [state, onChange])
   return (
     <div className="card" style={{ border: filled ? `2px solid ${ac}` : undefined }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div className="upload-zone-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: 18, margin: 0, color: ac }}>{label}</h3>
         <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 8, background: theme === 'dark' ? '#141d35' : '#f3f4f6' }}>
           {(['upload','paste'] as const).map(m => (
@@ -98,7 +98,10 @@ export default function AnalyzePage() {
       const jdText = `Job Title: ${role?.title}\nRequired Skills: ${role?.skills.join(', ')}\nCategory: ${role?.category}`
       return new File([jdText], 'jd.txt', { type: 'text/plain' })
     }
-    const jdText = `Job Title: ${jobTitle}\nThis is a ${jobTitle} position requiring relevant skills and experience.`
+    const jdText = `Job Title: ${jobTitle}
+Role Summary: ${jobTitle} position in a modern organization.
+Responsibilities: Perform core duties expected of a ${jobTitle}, collaborate with cross-functional teams, and deliver quality outcomes.
+Required Skills: Infer and evaluate all skills typically required for a ${jobTitle} role, including tools, methodologies, and domain knowledge relevant to this job title.`
     return new File([jdText], 'jd.txt', { type: 'text/plain' })
   }
 
@@ -152,10 +155,10 @@ export default function AnalyzePage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', paddingTop: 100, paddingBottom: 64 }}>
+    <div className="analyze-page" style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', paddingTop: 100, paddingBottom: 64 }}>
       <div className="aurora-bg" style={{ position: 'absolute', inset: 0 }} />
       <div className="dot-grid" style={{ position: 'absolute', inset: 0, opacity: 0.2 }} />
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: 900, margin: '0 auto', padding: '0 24px' }}>
+      <div className="page-content-wide" style={{ position: 'relative', zIndex: 10 }}>
 
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 'clamp(32px,5vw,52px)', margin: '0 0 12px' }}>Find your <span className="gradient-text">gap.</span></h1>
@@ -166,10 +169,10 @@ export default function AnalyzePage() {
           <div style={{ marginBottom: 24, padding: '12px 20px', borderRadius: 12, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', fontSize: 14, textAlign: 'center' }}>{error}</div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: compareMode ? 'repeat(3,1fr)' : '1fr 1fr', gap: 24, marginBottom: 24 }}>
+        <div className={`grid-2${compareMode ? ' grid-3' : ''}`} style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <UploadZone label="Your Resume" color="brand" state={resume} onChange={setResume} />
-            <button onClick={() => setCompareMode(!compareMode)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px', borderRadius: 10, border: `1px dashed ${compareMode ? '#6C63FF' : 'rgba(255,255,255,0.15)'}`, background: compareMode ? 'rgba(108,99,255,0.08)' : 'transparent', color: compareMode ? '#7c83fc' : '#6b7280', fontSize: 12, cursor: 'pointer', fontFamily: 'DM Sans,sans-serif' }}>
+            <button onClick={() => setCompareMode(!compareMode)} className="compare-toggle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px', borderRadius: 10, border: `1px dashed ${compareMode ? '#6C63FF' : 'rgba(255,255,255,0.15)'}`, background: compareMode ? 'rgba(108,99,255,0.08)' : 'transparent', color: compareMode ? '#7c83fc' : '#6b7280', fontSize: 12, cursor: 'pointer', fontFamily: 'DM Sans,sans-serif' }}>
               <GitCompare size={13} />{compareMode ? 'Comparison mode ON — click to disable' : 'Compare 2 resumes vs 1 JD'}
             </button>
           </div>
@@ -181,7 +184,7 @@ export default function AnalyzePage() {
               <h3 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: 18, margin: 0, color: '#00D4FF' }}>Target Role</h3>
             </div>
 
-            <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 10, background: theme === 'dark' ? '#141d35' : '#f3f4f6', marginBottom: 16 }}>
+            <div className="jd-mode-tabs" style={{ background: theme === 'dark' ? '#141d35' : '#f3f4f6' }}>
               {modeTab('upload', 'Upload JD', <FileText size={13} />)}
               {modeTab('role', 'Pick Role', <Search size={13} />)}
               {modeTab('title', 'Job Title', <Briefcase size={13} />)}
@@ -222,7 +225,7 @@ export default function AnalyzePage() {
                   <Search size={14} color="#6b7280" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
                   <input value={roleSearch} onChange={e => setRoleSearch(e.target.value)} placeholder="Search roles..." style={{ width: '100%', padding: '8px 12px 8px 34px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: theme === 'dark' ? '#141d35' : '#f9fafb', color: theme === 'dark' ? 'white' : '#111', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'DM Sans,sans-serif' }} />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
+                <div className="role-picker-grid">
                   {filteredRoles.map(role => (
                     <button key={role.id} onClick={() => setSelectedRole(role.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, border: `1px solid ${selectedRole === role.id ? '#00D4FF' : 'rgba(255,255,255,0.08)'}`, background: selectedRole === role.id ? 'rgba(0,212,255,0.1)' : 'transparent', cursor: 'pointer', fontSize: 12, color: selectedRole === role.id ? '#00D4FF' : theme === 'dark' ? '#d1d5db' : '#374151', fontFamily: 'DM Sans,sans-serif', textAlign: 'left' as const }}>
                       <span style={{ fontSize: 18 }}>{role.icon}</span>
@@ -240,8 +243,10 @@ export default function AnalyzePage() {
 
             {jdMode === 'title' && (
               <div>
-                <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px' }}>Just type your target job title — Nexara will figure out the required skills.</p>
-                <input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g. DevOps Engineer, ML Engineer..." style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${jobTitle ? '#00D4FF' : 'rgba(255,255,255,0.1)'}`, background: theme === 'dark' ? '#141d35' : '#f9fafb', color: theme === 'dark' ? 'white' : '#111', fontSize: 14, outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'DM Sans,sans-serif' }} />
+                <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px' }}>
+                  Type <strong>any</strong> job title — Nexara uses AI to infer the skills required for that role (e.g. Quality Assurance Analyst, Nurse, Lawyer, Chef).
+                </p>
+                <input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g. DevOps Engineer, QA Analyst, Financial Analyst..." style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: `1px solid ${jobTitle ? '#00D4FF' : 'rgba(255,255,255,0.1)'}`, background: theme === 'dark' ? '#141d35' : '#f9fafb', color: theme === 'dark' ? 'white' : '#111', fontSize: 14, outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'DM Sans,sans-serif' }} />
                 {jobTitle && (
                   <p style={{ fontSize: 12, color: '#00D4FF', margin: '8px 0 0', fontFamily: 'JetBrains Mono,monospace' }}>
                     ✓ Will analyze for: {jobTitle}
@@ -253,7 +258,7 @@ export default function AnalyzePage() {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <button onClick={handleAnalyze} disabled={!canAnalyze} className="btn-primary" style={{ fontSize: 17, padding: '16px 48px' }}>
+          <button onClick={handleAnalyze} disabled={!canAnalyze} className="btn-primary mobile-full" style={{ fontSize: 17, padding: '16px 48px' }}>
             Analyze with Nexara <ChevronRight size={20} />
           </button>
           <p style={{ fontSize: 12, color: '#6b7280', marginTop: 16 }}>✦ Your data is processed in-memory. Nothing is stored.</p>

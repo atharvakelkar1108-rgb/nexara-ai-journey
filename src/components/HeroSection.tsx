@@ -55,7 +55,7 @@ export default function HeroSection() {
           ✦ Powered by AI • Adaptive Learning Engine
         </div>
 
-        <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(48px, 8vw, 88px)', lineHeight: 1.05, margin: '0 0 24px' }} className="animate-slide-up">
+        <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(36px, 10vw, 88px)', lineHeight: 1.05, margin: '0 0 24px' }} className="animate-slide-up">
           <span style={{ color: 'inherit' }}>Your next era</span><br />
           <span className="gradient-text">starts here.</span>
         </h1>
@@ -75,7 +75,7 @@ export default function HeroSection() {
           </Link>
         </div>
 
-        <div ref={statsRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 500, margin: '0 auto' }}>
+        <div ref={statsRef} className="grid-3" style={{ maxWidth: 500, margin: '0 auto' }}>
           {[
             { icon: Zap, value: `${s1}%`, label: 'Faster onboarding', color: '#7c83fc' },
             { icon: Target, value: `${s2}`, label: 'Redundant modules', color: '#00F5A0' },

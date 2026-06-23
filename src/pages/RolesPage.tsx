@@ -19,7 +19,7 @@ export default function RolesPage() {
       <div style={{ position: 'relative', zIndex: 10, maxWidth: 1000, margin: '0 auto', padding: '0 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 'clamp(32px,5vw,52px)', margin: '0 0 12px' }}>Explore <span className="gradient-text">roles</span></h1>
-          <p style={{ color: '#6b7280', margin: 0 }}>Pick a role to see required skills and start your path</p>
+          <p style={{ color: '#6b7280', margin: 0 }}>Browse 40+ popular roles — or type any job title on the Analyze page</p>
         </div>
         <div style={{ display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap' as const }}>
           <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
@@ -32,6 +32,13 @@ export default function RolesPage() {
             ))}
           </div>
         </div>
+        {filtered.length === 0 && (
+          <div className="card" style={{ textAlign: 'center', padding: 32, marginBottom: 24 }}>
+            <p style={{ margin: '0 0 8px', fontWeight: 600 }}>Role not in the list?</p>
+            <p style={{ margin: '0 0 16px', color: '#6b7280', fontSize: 14 }}>No problem — go to Analyze and type any job title. Nexara will infer the required skills automatically.</p>
+            <button onClick={() => navigate('/analyze')} className="btn-primary">Analyze any role</button>
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 16 }}>
           {filtered.map((role, i) => (
             <div key={role.id} className="card" onClick={() => navigate('/analyze')}
