@@ -4,15 +4,28 @@ from fastapi.responses import EventSourceResponse
 import uvicorn
 import asyncio
 import json
+import os
 import random
 from skill_extractor import extract_text_from_pdf, extract_skills, extract_jd_requirements
 from gap_engine import analyze_gap, build_learning_path, generate_reasoning
 
 app = FastAPI(title="Nexara API")
 
+DEFAULT_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://nexara-ai-journey.vercel.app",
+]
+extra_origins = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+allowed_origins = list(dict.fromkeys(DEFAULT_ORIGINS + extra_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,7 +125,13 @@ async def analyze_full(
             "reasoning_trace": reasoning_trace
         }
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        message = str(exc)
+        if "invalid_api_key" in message or "Invalid API Key" in message:
+            raise HTTPException(
+                status_code=503,
+                detail="Groq API key is missing or invalid. Set GROQ_API_KEY in backend/.env (local) or Render environment variables (production).",
+            )
+        raise HTTPException(status_code=500, detail=message)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
