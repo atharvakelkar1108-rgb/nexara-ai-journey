@@ -1,5 +1,7 @@
 ﻿import os
 import json
+import re
+import logging
 from groq import Groq
 import pdfplumber
 import io
@@ -49,11 +51,37 @@ RESUME:
     )
     raw = response.choices[0].message.content.strip()
     raw = raw.replace("```json", "").replace("```", "").strip()
-    return json.loads(raw)
+    try:
+        return json.loads(raw)
+    except Exception:
+        logging.exception("Failed to parse JSON from LLM in extract_skills")
+        # Try to extract a JSON substring heuristically (first {...} or [...])
+        m = re.search(r"(\{.*\}|\[.*\])", raw, flags=re.DOTALL)
+        if m:
+            snippet = m.group(0)
+            try:
+                return json.loads(snippet)
+            except Exception:
+                logging.exception("Failed to parse JSON snippet from LLM in extract_skills")
+        # Raise a clearer error so the API can return a helpful message
+        preview = (raw[:300] + "...") if len(raw) > 300 else raw
+        raise RuntimeError(f"LLM returned invalid JSON. Raw response preview: {preview}")
 
 def _parse_llm_json(raw: str) -> dict:
     raw = raw.replace("```json", "").replace("```", "").strip()
-    return json.loads(raw)
+    try:
+        return json.loads(raw)
+    except Exception:
+        logging.exception("Failed to parse JSON from LLM in _parse_llm_json")
+        m = re.search(r"(\{.*\}|\[.*\])", raw, flags=re.DOTALL)
+        if m:
+            snippet = m.group(0)
+            try:
+                return json.loads(snippet)
+            except Exception:
+                logging.exception("Failed to parse JSON snippet in _parse_llm_json")
+        preview = (raw[:300] + "...") if len(raw) > 300 else raw
+        raise RuntimeError(f"LLM returned invalid JSON. Raw response preview: {preview}")
 
 
 def _call_llm(prompt: str) -> dict:
