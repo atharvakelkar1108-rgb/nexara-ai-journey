@@ -19,55 +19,20 @@ if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
     )
 
 client = Groq(api_key=GROQ_API_KEY)
+MODEL = "openai/gpt-oss-20b"
+# gpt-oss uses reasoning tokens that count against max_completion_tokens.
+# Keep reasoning low and give enough room so JSON is not truncated.
+MAX_COMPLETION_TOKENS = 4096
+
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
         return "\n".join(page.extract_text() or "" for page in pdf.pages)
 
-def extract_skills(text: str) -> dict:
-    prompt = f"""You are a skill extraction engine. Extract skills from this resume.
-
-Return ONLY valid JSON, no explanation, no markdown, no backticks:
-{{
-  "skills": [
-    {{"name": "Python", "level": "intermediate", "years": 2}},
-    {{"name": "Docker", "level": "beginner", "years": 0}}
-  ],
-  "experience_years": 3,
-  "job_category": "technical"
-}}
-
-Levels must be exactly: beginner, intermediate, or expert
-Job categories must be exactly: technical, managerial, or operational
-
-RESUME:
-{text[:3000]}"""
-
-    response = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.1,
-        max_tokens=1000,
-    )
-    raw = response.choices[0].message.content.strip()
-    raw = raw.replace("```json", "").replace("```", "").strip()
-    try:
-        return json.loads(raw)
-    except Exception:
-        logging.exception("Failed to parse JSON from LLM in extract_skills")
-        # Try to extract a JSON substring heuristically (first {...} or [...])
-        m = re.search(r"(\{.*\}|\[.*\])", raw, flags=re.DOTALL)
-        if m:
-            snippet = m.group(0)
-            try:
-                return json.loads(snippet)
-            except Exception:
-                logging.exception("Failed to parse JSON snippet from LLM in extract_skills")
-        # Raise a clearer error so the API can return a helpful message
-        preview = (raw[:300] + "...") if len(raw) > 300 else raw
-        raise RuntimeError(f"LLM returned invalid JSON. Raw response preview: {preview}")
 
 def _parse_llm_json(raw: str) -> dict:
+    if not raw:
+        raise RuntimeError("LLM returned an empty response.")
     raw = raw.replace("```json", "").replace("```", "").strip()
     try:
         return json.loads(raw)
@@ -86,12 +51,49 @@ def _parse_llm_json(raw: str) -> dict:
 
 def _call_llm(prompt: str) -> dict:
     response = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
-        messages=[{"role": "user", "content": prompt}],
+        model=MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": "Return only a valid JSON object. No markdown, no explanation.",
+            },
+            {"role": "user", "content": prompt},
+        ],
         temperature=0.1,
-        max_tokens=1000,
+        max_completion_tokens=MAX_COMPLETION_TOKENS,
+        reasoning_effort="low",
+        response_format={"type": "json_object"},
     )
-    return _parse_llm_json(response.choices[0].message.content.strip())
+    choice = response.choices[0]
+    if choice.finish_reason == "length":
+        raise RuntimeError(
+            "LLM response was truncated (finish_reason=length). "
+            "Try again with a shorter resume or fewer skills."
+        )
+    content = (choice.message.content or "").strip()
+    return _parse_llm_json(content)
+
+
+def extract_skills(text: str) -> dict:
+    prompt = f"""You are a skill extraction engine. Extract at most 15 skills from this resume.
+
+Return ONLY valid JSON:
+{{
+  "skills": [
+    {{"name": "Python", "level": "intermediate", "years": 2}},
+    {{"name": "Docker", "level": "beginner", "years": 0}}
+  ],
+  "experience_years": 3,
+  "job_category": "technical"
+}}
+
+Levels must be exactly: beginner, intermediate, or expert
+Job categories must be exactly: technical, managerial, or operational
+
+RESUME:
+{text[:3000]}"""
+
+    return _call_llm(prompt)
 
 
 def infer_role_requirements(job_title: str) -> dict:
@@ -103,7 +105,7 @@ Infer 8-12 skills typically required for this EXACT role in the industry today.
 Works for ANY role — technical, managerial, operational, creative, healthcare, legal, finance, education, trades, etc.
 Use standard skill names that appear on resumes and job postings.
 
-Return ONLY valid JSON, no explanation, no markdown, no backticks:
+Return ONLY valid JSON:
 {{
   "required_skills": [
     {{"name": "Manual Testing", "importance": "must-have", "level_required": "intermediate"}},
@@ -134,7 +136,7 @@ def extract_jd_requirements(jd_text: str) -> dict:
 If the input only contains a job title with little or no detail, infer 8-12 typical skills
 required for that role in the industry. Always return at least 6 required_skills.
 
-Return ONLY valid JSON, no explanation, no markdown, no backticks:
+Return ONLY valid JSON:
 {{
   "required_skills": [
     {{"name": "Kubernetes", "importance": "must-have", "level_required": "intermediate"}},
