@@ -109,7 +109,7 @@ async def analyze_full(
         ]
 
         reasoning_trace = [
-            f"Step 1: Extracted {len(resume_data['skills'])} skills from resume using Claude claude-sonnet-4-20250514",
+            f"Step 1: Extracted {len(resume_data['skills'])} skills from resume using openai/gpt-oss-20b",
             f"Step 2: Identified {len(jd_data['required_skills'])} required skills from JD",
             f"Step 3: Found {len(gap['have'])} exact matches, {len(gap['improve'])} partial matches, {len(gap['missing'])} gaps",
             f"Step 4: Detected job category as '{job_category}' — filtered course catalog accordingly",

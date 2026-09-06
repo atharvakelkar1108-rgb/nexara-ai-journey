@@ -44,7 +44,7 @@ RESUME:
 {text[:3000]}"""
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1,
         max_tokens=1000,
@@ -86,7 +86,7 @@ def _parse_llm_json(raw: str) -> dict:
 
 def _call_llm(prompt: str) -> dict:
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1,
         max_tokens=1000,
